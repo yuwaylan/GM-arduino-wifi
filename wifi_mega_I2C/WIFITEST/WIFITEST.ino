@@ -28,10 +28,12 @@ void setup()
   digitalWrite(2, LOW);
 }
 
+int charis = 0;
 void loop()
 {
 
   WiFiClient client = server.available();
+  charis += (charis >= 5 ? -4 : 1);
   if (!client)
   {
     return;
@@ -45,8 +47,36 @@ void loop()
   // client.println("Content-Type: text/html");
   client.println("<!DOCTYPE HTML>");
   client.println("<html>");
-  client.println("<head></head><body>");
-  client.println("AAAAAA");
+  client.println("<head><meta http-equiv= \"refresh\" content=\" 2 \" /></head><body>");
+  // to let client refresh automatically
+  switch (charis)
+  {
+  case 1:
+    client.println("AAAAAA");
+    client.println("<br>");
+    client.println(charis);
+    break;
+  case 2:
+    client.println("BBBBBB");
+    client.println("<br>");
+    client.println(charis);
+    break;
+  case 3:
+    client.println("CCCCC");
+    client.println("<br>");
+    client.println(charis);
+    break;
+  case 4:
+    client.println("DDDDDD");
+    client.println("<br>");
+    client.println(charis);
+    break;
+  case 5:
+    client.println("EEEEEE");
+    client.println("<br>");
+    client.println(charis);
+    break;
+  }
   // client.println(Serial.read());
   client.println("</body></html>");
   client.flush();
