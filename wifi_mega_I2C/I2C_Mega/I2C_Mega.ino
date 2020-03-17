@@ -14,13 +14,13 @@ String tags[49]={
 #define LEN(x) sizeof(x) / sizeof(x[0]) //陣列長度
 #define RST_PIN 49 // 讀卡機的重置腳位
 #define SS_PIN 53  // 晶片選擇腳位
-SoftwareSerial mySerial(19,18);// //建立軟體串列埠腳位 (RX, TX)
+SoftwareSerial mwifi(2,3);// //建立軟體串列埠腳位 (RX, TX)
 MFRC522 mfrc522(SS_PIN, RST_PIN); // 建立MFRC522物件
 
 void setup()
 {
   Serial.begin(9600);
-   mySerial.begin(9600);  //設定軟體通訊速率
+  mwifi.begin(9600);  //設定軟體通訊速率
   SPI.begin();
   mfrc522.PCD_Init(); // 初始化MFRC522讀卡機模組
   Serial.println("RFID reader is ready!");
@@ -31,13 +31,19 @@ void loop()
 {
   
   if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial())
-  {int t=gettag();
+  {
+    int t=gettag();
     if(t>0)
     {
+      mwifi.println(t);
       Serial.println(t);
+      mwifi.println('\n');
     }
   }
 
+mwifi.println(10);
+ mwifi.println('\n');
+ delay(300);
  /* while (!mySerial.available()) {}  
   //等到一號機傳送字元才到下一步
   

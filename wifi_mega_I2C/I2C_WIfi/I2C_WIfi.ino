@@ -5,7 +5,7 @@ String WIFINAME = "GOGO";
 String WIFIPASSWORD = "qqqqqqqq";
 IPAddress staticIP(192, 168, 137, 250);
 IPAddress subnet(255, 255, 255, 0);
-SoftwareSerial mySerial(21,22);//建立軟體串列埠腳位 (RX, TX)
+SoftwareSerial mega(7,16);//建立軟體串列埠腳位 (RX, TX)
 WiFiServer server(80);
 
 void setup()
@@ -26,7 +26,7 @@ void setup()
   Serial.println();
   Serial.println((WiFi.localIP().toString()));
   server.begin();
-  mySerial.begin(9600);  //設定軟體通訊速率
+  mega.begin(4800);  //設定軟體通訊速率
   digitalWrite(2, LOW);
 }
 
@@ -44,15 +44,13 @@ void loop()
    digitalWrite(14, HIGH);
     delay(1);
   }  
-   while (!mySerial.available()) {} 
-  //直到暫存器出現訊號才跳出迴圈
   
-  Serial.write(mySerial.read());  //傳輸讀取的訊號
-  
-  while (mySerial.available()>0) {
-   //如果暫存器有訊號則不斷讀取直到沒有
-    mySerial.read();
-  }  
+   while(mega.available() > 0){
+    int val =mega.read();
+    if(mega.read()=='\n'){
+      Serial.println(val);
+    }
+  }
 
   /*-------do sth to  string s-----s=> site context -------*/
   
