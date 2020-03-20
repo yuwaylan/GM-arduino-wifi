@@ -14,7 +14,7 @@ String tags[49]={
 #define LEN(x) sizeof(x) / sizeof(x[0]) //陣列長度
 #define RST_PIN 49 // 讀卡機的重置腳位
 #define SS_PIN 53  // 晶片選擇腳位
-SoftwareSerial mwifi(2,3);// //建立軟體串列埠腳位 (RX, TX)
+SoftwareSerial mwifi(15,14);// //建立軟體串列埠腳位 (RX, TX)
 MFRC522 mfrc522(SS_PIN, RST_PIN); // 建立MFRC522物件
 
 void setup()
@@ -35,15 +35,15 @@ void loop()
     int t=gettag();
     if(t>0)
     {
-      mwifi.println(t);
+      mwifi.write(t);
       Serial.println(t);
-      mwifi.println('\n');
+    
     }
   }
 
-mwifi.println(10);
- mwifi.println('\n');
- delay(300);
+ // mwifi.println(10);
+ //mwifi.println('\n');
+ delay(100);
  /* while (!mySerial.available()) {}  
   //等到一號機傳送字元才到下一步
   
