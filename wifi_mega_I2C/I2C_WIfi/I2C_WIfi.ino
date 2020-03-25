@@ -13,7 +13,7 @@ void setup()
   pinMode(D5, OUTPUT);
   pinMode(D6, OUTPUT);
   pinMode(D7, OUTPUT);
-  Serial.begin(9600);
+  Serial.begin(115200);
   delay(3000);
   WiFi.disconnect();
   WiFi.begin(WIFINAME, WIFIPASSWORD);

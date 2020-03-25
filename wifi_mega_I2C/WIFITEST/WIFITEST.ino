@@ -1,23 +1,26 @@
 #include <ESP8266WiFi.h>
+#include <SoftwareSerial.h>//for I2C
 
 String WIFINAME = "GOGO";
 String WIFIPASSWORD = "qqqqqqqq";
 IPAddress staticIP(192, 168, 137, 250);
 IPAddress subnet(255, 255, 255, 0);
-
+SoftwareSerial mega(D5,D6);//建立軟體串列埠腳位 (RX, TX)
 WiFiServer server(80);
 
 void setup()
 {
-  pinMode(14, OUTPUT);
-  pinMode(2, OUTPUT);
+  pinMode(D5, OUTPUT);
+  pinMode(D6, OUTPUT);
+  pinMode(D7, OUTPUT);
   Serial.begin(115200);
   delay(3000);
   WiFi.disconnect();
   WiFi.begin(WIFINAME, WIFIPASSWORD);
-  digitalWrite(2, HIGH);
+  
   while ((!(WiFi.status() == WL_CONNECTED)))
   {
+     digitalWrite(D7, HIGH);
     delay(100);
   }
   WiFi.config(staticIP, WiFi.gatewayIP(), subnet);
@@ -25,61 +28,44 @@ void setup()
   Serial.println();
   Serial.println((WiFi.localIP().toString()));
   server.begin();
-  digitalWrite(2, LOW);
+   digitalWrite(D7, LOW);
+  mega.begin(9600);  //設定軟體通訊速率
+  
 }
 
 int charis = 0;
+int counter_id=0;
+String  s="NONE";
+String recive="Recive NONE";
+String url="192.168.137.1/ud.php?c=1";
+//const char* urltest ="https://www.google.com.tw/";
 void loop()
 {
-
-  WiFiClient client = server.available();
-  charis += (charis >= 5 ? -4 : 1);
-  if (!client)
-  {
-    return;
-  }
-  while (!client.available())
-  {
-    delay(1);
-  }
-  Serial.println((client.readStringUntil('\r')));
-  // client.println("HTTP/1.1 200 OK");
-  // client.println("Content-Type: text/html");
-  client.println("<!DOCTYPE HTML>");
-  client.println("<html>");
-  client.println("<head><meta http-equiv= \"refresh\" content=\" 2 \" /></head><body>");
-  // to let client refresh automatically
-  switch (charis)
-  {
-  case 1:
-    client.println("AAAAAA");
-    client.println("<br>");
-    client.println(charis);
-    break;
-  case 2:
-    client.println("BBBBBB");
-    client.println("<br>");
-    client.println(charis);
-    break;
-  case 3:
-    client.println("CCCCC");
-    client.println("<br>");
-    client.println(charis);
-    break;
-  case 4:
-    client.println("DDDDDD");
-    client.println("<br>");
-    client.println(charis);
-    break;
-  case 5:
-    client.println("EEEEEE");
-    client.println("<br>");
-    client.println(charis);
-    break;
-  }
-  // client.println(Serial.read());
-  client.println("</body></html>");
-  client.flush();
+  s=mega.readString();
+  //Serial.println(s);
+ 
+ 
+   
+  /*-------do sth to  string s-----s=> site url -------*/
+  WiFiClient client;
+  url=url+s;
+  do{
+    Serial.println(url);
+    Serial.println("Not yet");
+     bblink();
+  }while(!client.connect(url,80));
+  Serial.println("success");
+  delay(300);
   client.stop();
-  delay(1000);
+   s="null";
 }
+
+void bblink(){
+  digitalWrite(D7, HIGH);
+  delay(300);
+  digitalWrite(D7, LOW);
+  delay(100);
+ 
+}
+
+ 
