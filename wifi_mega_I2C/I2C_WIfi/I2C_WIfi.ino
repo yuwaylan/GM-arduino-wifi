@@ -1,9 +1,9 @@
 #include <ESP8266WiFi.h>
 #include <SoftwareSerial.h>//for I2C
 
-String WIFINAME = "GOGO";
-String WIFIPASSWORD = "qqqqqqqq";
-IPAddress staticIP(192, 168, 137, 250);
+String WIFINAME = "哈哈是我的iphone辣";
+String WIFIPASSWORD = "12345678";
+IPAddress staticIP(172, 20, 10, 250);
 IPAddress subnet(255, 255, 255, 0);
 SoftwareSerial mega(D5,D6);//建立軟體串列埠腳位 (RX, TX)
 WiFiServer server(80);

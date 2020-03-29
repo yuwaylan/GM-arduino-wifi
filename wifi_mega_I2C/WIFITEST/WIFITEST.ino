@@ -1,9 +1,10 @@
 #include <ESP8266WiFi.h>
 #include <SoftwareSerial.h>//for I2C
-
-String WIFINAME = "GOGO";
-String WIFIPASSWORD = "qqqqqqqq";
-IPAddress staticIP(192, 168, 137, 250);
+ 
+ 
+String WIFINAME = "itsme";
+String WIFIPASSWORD = "12345678";
+IPAddress staticIP(192, 168, 43, 250);
 IPAddress subnet(255, 255, 255, 0);
 SoftwareSerial mega(D5,D6);//建立軟體串列埠腳位 (RX, TX)
 WiFiServer server(80);
@@ -20,52 +21,58 @@ void setup()
   
   while ((!(WiFi.status() == WL_CONNECTED)))
   {
-     digitalWrite(D7, HIGH);
     delay(100);
+     digitalWrite(D7, HIGH);
   }
   WiFi.config(staticIP, WiFi.gatewayIP(), subnet);
   delay(3000);
   Serial.println();
   Serial.println((WiFi.localIP().toString()));
   server.begin();
-   digitalWrite(D7, LOW);
   mega.begin(9600);  //設定軟體通訊速率
+   digitalWrite(D7, LOW);
   
 }
 
 int charis = 0;
-int counter_id=0;
 String  s="NONE";
-String recive="Recive NONE";
-String url="192.168.137.1/ud.php?c=1";
-//const char* urltest ="https://www.google.com.tw/";
 void loop()
 {
-  s=mega.readString();
-  //Serial.println(s);
+  WiFiClient client = server.available();
+  if (!client){
+     digitalWrite(D7, LOW);
+    return;
+  }
+  while (!client.available()){
+   digitalWrite(D7, HIGH);
+    delay(1);
+  }  
  
- 
-   
-  /*-------do sth to  string s-----s=> site url -------*/
-  WiFiClient client;
-  url=url+s;
-  do{
-    Serial.println(url);
-    Serial.println("Not yet");
-     bblink();
-  }while(!client.connect(url,80));
-  Serial.println("success");
-  delay(300);
+   while(mega.available()){
+    s=mega.readString();     
+    Serial.println("getla");
+  }
+
+  /*-------do sth to  string s-----s=> site context -------*/
+  
+  /*-------------------------------------------------------*/
+  sitestring(s,client);
+  
+}
+
+void sitestring(String ms,WiFiClient &client){
+  Serial.println((client.readStringUntil('\r')));
+  client.println("<!DOCTYPE HTML>");
+  client.println("<html>");
+  client.println("<head><meta http-equiv= \"refresh\" content=\" 1 \" /></head><body>");
+  // to let client refresh automatically
+ /*-----------------------------------------------*/
+ /*-----------------------------------------------*/
+   //client.println("IIIII");
+  client.println(ms);
+  client.println("</body></html>");
+  Serial.print(s);
+  client.flush();
   client.stop();
-   s="null";
+  //delay(1000);
 }
-
-void bblink(){
-  digitalWrite(D7, HIGH);
-  delay(300);
-  digitalWrite(D7, LOW);
-  delay(100);
- 
-}
-
- 

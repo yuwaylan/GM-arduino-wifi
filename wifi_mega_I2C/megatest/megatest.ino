@@ -13,43 +13,47 @@ String tags[49]={
 
 #define RST_PIN 49 // 讀卡機的重置腳位
 #define SS_PIN 53  // 晶片選擇腳位
-SoftwareSerial mwifi(15,14);// //建立軟體串列埠腳位 (RX, TX)
+#define Pin_D1_L  40 //lpwm
+#define Pin_D2_L  42 //rpwm
+#define Pin_E_L   44 //pwm enable
+SoftwareSerial mwifi(12,13);// //建立軟體串列埠腳位 (RX, TX)
 MFRC522 mfrc522(SS_PIN, RST_PIN); // 建立MFRC522物件
-String sendmessage;
-int s=-1,u1=-1,u2=-1,u3=-1,r=-1;
+String sendmessage;int t=0;
+int s=-1,u1=2,u2=2,u3=2,r=-1;
 void setup()
 {
   Serial.begin(115200);
   mwifi.begin(9600);  //設定軟體通訊速率
   SPI.begin();
   mfrc522.PCD_Init(); // 初始化MFRC522讀卡機模組
+  pinMode(Pin_D1_L, OUTPUT);
+  pinMode(Pin_D2_L, OUTPUT);
+  pinMode(Pin_E_L, OUTPUT);
   Serial.println("RFID reader is ready!");
 }
 
 
 void loop()
 {
-  
+  sendmessage="";
   if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial())
   {
-    int t=gettag();
+    t=gettag();
     if(t>0)
     { 
-      r=t;
       Serial.println(t);
+     // mwifi.print(t);
+     r=t;
     }
   }
 
   
- 
-    if(mwifi.print(sendtowifi())){
-      Serial.print("Sent:  ");
-      Serial.println(sendmessage);
-    }
-    String recive=mwifi.readString();
+ mwifi.print(sendtowifi());
+   delay(300);
+   /* String recive=mwifi.readString();
     Serial.print(recive);
     delay(300);
-    recive="null";
+    recive="null";*/
 }
 
 
@@ -82,16 +86,16 @@ int gettag(){
 
 
 String sendtowifi(){
-  sendmessage="&s=";
+  //sendmessage="";
   sendmessage+=s;
-  sendmessage+="&u1=";
+  sendmessage+=",";
   sendmessage+=u1;
-  sendmessage+="&u2=";
+  sendmessage+=",";
   sendmessage+=u2;
-  sendmessage+="&u3=";
+  sendmessage+=",";
   sendmessage+=u3;
-  sendmessage+="&r=";
+  sendmessage+=",";
   sendmessage+=r;
-  
+  Serial.println(sendmessage);
   return sendmessage;
 }
