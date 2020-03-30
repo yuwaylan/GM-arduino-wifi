@@ -1,15 +1,21 @@
 #include <ESP8266WiFi.h>
 #include <SoftwareSerial.h>//for I2C
-
-String WIFINAME = "哈哈是我的iphone辣";
-String WIFIPASSWORD = "12345678";
-IPAddress staticIP(172, 20, 10, 250);
+ 
+ 
+//String WIFINAME = "itsme";
+//String WIFIPASSWORD = "12345678";
+ 
+ 
+String WIFINAME = "GOGO";
+String WIFIPASSWORD = "qqqqqqqq";
+IPAddress staticIP(192, 168, 137, 250);
 IPAddress subnet(255, 255, 255, 0);
 SoftwareSerial mega(D5,D6);//建立軟體串列埠腳位 (RX, TX)
 WiFiServer server(80);
 
 void setup()
 {
+  pinMode(D4, OUTPUT);
   pinMode(D5, OUTPUT);
   pinMode(D6, OUTPUT);
   pinMode(D7, OUTPUT);
@@ -17,7 +23,7 @@ void setup()
   delay(3000);
   WiFi.disconnect();
   WiFi.begin(WIFINAME, WIFIPASSWORD);
-  
+  digitalWrite(D7, HIGH);digitalWrite(D4, LOW);
   while ((!(WiFi.status() == WL_CONNECTED)))
   {
     delay(100);
@@ -27,12 +33,13 @@ void setup()
   Serial.println();
   Serial.println((WiFi.localIP().toString()));
   server.begin();
-  mega.begin(9600);  //設定軟體通訊速率
-  
+  mega.begin(4800);  //設定軟體通訊速率
+  digitalWrite(D7, LOW);
+  digitalWrite(D4,HIGH);
 }
 
 int charis = 0;
-String  s="NONE";
+String s="0000";
 void loop()
 {
 
@@ -45,37 +52,28 @@ void loop()
    digitalWrite(D7, HIGH);
     delay(1);
   }  
- 
-   while(mega.available()){
-    int val =99;
-    val=mega.read();
-    if(val==99){
-      mega.println("No read");
-      Serial.println("No read");
-    }
-    else{
-      mega.println("readed");
-     }
-    s="readed";
-   // if(mega.read()=='\n')
-      //Serial.println(val);
-    s="<RFIDID>RFID :";
-    s+=val;
-    s+="</RFIDID>";
-  }
 
+  /*------MEGA I2C---------------*/
+   while(mega.available() > 0){
+    String val =mega.readString();
+    Serial.println(val);
+  }
+  /*------------------------------*/
+  
   /*-------do sth to  string s-----s=> site context -------*/
   
   /*-------------------------------------------------------*/
-  sitestring(s,client);
-  
+  sitestring(s,client);//SEND to client
 }
+//END LOOOP
 
+
+  /*-------編寫網頁內容-------*/
 void sitestring(String s,WiFiClient &client){
   Serial.println((client.readStringUntil('\r')));
   client.println("<!DOCTYPE HTML>");
   client.println("<html>");
-  client.println("<head><meta http-equiv= \"refresh\" content=\" 1 \" /></head><body>");
+  client.println("<head><meta http-equiv= \"refresh\" content=\" 2 \" /></head><body>");
   // to let client refresh automatically
  /*-----------------------------------------------*/
  /*-----------------------------------------------*/
@@ -84,5 +82,5 @@ void sitestring(String s,WiFiClient &client){
   client.println("</body></html>");
   client.flush();
   client.stop();
-  //delay(1000);
+  delay(1000);
 }

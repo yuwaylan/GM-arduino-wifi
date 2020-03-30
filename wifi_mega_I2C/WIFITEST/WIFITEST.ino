@@ -1,78 +1,52 @@
-#include <ESP8266WiFi.h>
+#include "ESP8266WiFi.h"
 #include <SoftwareSerial.h>//for I2C
- 
- 
-String WIFINAME = "itsme";
-String WIFIPASSWORD = "12345678";
-IPAddress staticIP(192, 168, 43, 250);
-IPAddress subnet(255, 255, 255, 0);
+const char* ssid = "GOGO";
+const char* password = "qqqqqqqq";
+const char* host = "192.168.137.1";  //網頁主機
+WiFiClient client;  //客戶端物件
+const int httpPort = 80;  //網頁伺服器埠號
 SoftwareSerial mega(D5,D6);//建立軟體串列埠腳位 (RX, TX)
-WiFiServer server(80);
-
 void setup()
 {
-  pinMode(D5, OUTPUT);
-  pinMode(D6, OUTPUT);
-  pinMode(D7, OUTPUT);
   Serial.begin(115200);
-  delay(3000);
-  WiFi.disconnect();
-  WiFi.begin(WIFINAME, WIFIPASSWORD);
-  
-  while ((!(WiFi.status() == WL_CONNECTED)))
-  {
-    delay(100);
-     digitalWrite(D7, HIGH);
-  }
-  WiFi.config(staticIP, WiFi.gatewayIP(), subnet);
-  delay(3000);
-  Serial.println();
-  Serial.println((WiFi.localIP().toString()));
-  server.begin();
-  mega.begin(9600);  //設定軟體通訊速率
-   digitalWrite(D7, LOW);
-  
-}
 
-int charis = 0;
-String  s="NONE";
-void loop()
-{
-  WiFiClient client = server.available();
-  if (!client){
-     digitalWrite(D7, LOW);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("WiFi connected!");  //已連接
+  Serial.print("IP: ");
+  Serial.println(WiFi.localIP());  //顯示IP位址
+}
+int counter = 0;
+void loop() {
+  String sendGET = "GET /ud.php?s=1&u1=0&u2=0&u3=0&c=100&r=";
+  sendGET += counter;
+  counter++;
+  
+  
+  Serial.print("connect to: ");  //顯示網頁主機
+  Serial.println(host);
+
+  if (!client.connect(host, httpPort)) {
+    Serial.println("connection failed!");  //主機連線失敗
     return;
   }
-  while (!client.available()){
-   digitalWrite(D7, HIGH);
-    delay(1);
-  }  
- 
-   while(mega.available()){
-    s=mega.readString();     
-    Serial.println("getla");
+  client.print(String(sendGET) + " HTTP/1.1\r\n" + "Host: " + host + "\r\nConnection: close\r\n\r\n");  //請求網頁
+  delay(10);
+
+  while (client.available()) { //取得資料
+    String line = client.readStringUntil('\r');  //一列資料
+    Serial.print(line);
   }
 
-  /*-------do sth to  string s-----s=> site context -------*/
-  
-  /*-------------------------------------------------------*/
-  sitestring(s,client);
-  
-}
+  Serial.println();
+  //Serial.println("closing connection!");
+  Serial.println(counter);
 
-void sitestring(String ms,WiFiClient &client){
-  Serial.println((client.readStringUntil('\r')));
-  client.println("<!DOCTYPE HTML>");
-  client.println("<html>");
-  client.println("<head><meta http-equiv= \"refresh\" content=\" 1 \" /></head><body>");
-  // to let client refresh automatically
- /*-----------------------------------------------*/
- /*-----------------------------------------------*/
-   //client.println("IIIII");
-  client.println(ms);
-  client.println("</body></html>");
-  Serial.print(s);
-  client.flush();
-  client.stop();
-  //delay(1000);
+  delay(1000);
+  if (counter >= 5000)
+    counter = 0;
 }
