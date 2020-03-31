@@ -15,12 +15,12 @@ String tags[49]={
 #define SS_PIN 53  // 晶片選擇腳位
 #define r3 30
 #define r4 31
-SoftwareSerial mwifi(2,3);// //建立軟體串列埠腳位 (RX, TX)
+SoftwareSerial mwifi(A0,A1);// //建立軟體串列埠腳位 (RX, TX)
 MFRC522 mfrc522(SS_PIN, RST_PIN); // 建立MFRC522物件
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   mwifi.begin(9600);  //設定軟體通訊速率
   SPI.begin();
   pinMode(r3,OUTPUT);
@@ -58,9 +58,9 @@ void loop()
     digitalWrite(r4,HIGH);
     digitalWrite(r3,LOW);
   }
-
-  mwifi.println(t);
-  Serial.println(t);
+  String S="HI WIFI";
+  mwifi.println(S);
+  //Serial.println(t);
  delay(300);
 
    
