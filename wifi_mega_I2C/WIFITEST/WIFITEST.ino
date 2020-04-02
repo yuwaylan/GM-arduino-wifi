@@ -1,5 +1,5 @@
 #include <String.h>
-#include "ESP8266WiFi.h"
+#include <ESP8266WiFi.h>
 #include <SoftwareSerial.h>//for I2C
 
 const char* ssid = "GOGO";
@@ -9,8 +9,7 @@ IPAddress staticIP(192, 168, 137, 250);
 IPAddress subnet(255, 255, 255, 0);
 WiFiClient client;  //客戶端物件
 const int httpPort = 80;
-
-SoftwareSerial mega(D0, D1); //建立軟體串列埠腳位 (RX, TX)
+SoftwareSerial mega(D1, D2); //建立軟體串列埠腳位 (RX, TX)
 
 void setup()
 {
@@ -24,16 +23,15 @@ void setup()
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(300);
-    //Serial.print(".");
   }
   Serial.println("");
   Serial.println("WiFi connected!");  //已連接
   Serial.print("IP: ");
   WiFi.config(staticIP, WiFi.gatewayIP(), subnet);
   delay(1000);
-   mega.setTimeout(100);
   Serial.println(WiFi.localIP());  //顯示IP位址
-  mega.begin(9600);  //設定軟體通訊速率
+  mega.begin(4800);  //設定軟體通訊速率
+  
   digitalWrite(D7, LOW);//紅燈
 }
 int counter = 0;
@@ -42,7 +40,7 @@ void loop() {
   //s99 for test
   
   /*------MEGA I2C---------------*/
-   while(mega.available() > 0){
+   if(mega.available()){
     String val =mega.readString();
     Serial.println(val);
     Serial.println("REC from mega");   
