@@ -29,18 +29,22 @@ void setup()
 }
 
 int last, current, t = 0;
+String stag = "";
 void loop()
-{ if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial())
+{ 
+ 
+  if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial())
   {
     t = gettag();
     if (t > 0)
     {
-      mwifi.print(t);
+       stag="";
+      stag+=t;
       Serial.println(t);
     }
   }
-  
-  mwifi.write("HI?");  /* sends hello string */
+
+  mwifi.println(stag);  /* sends hello string */
   delay(1000);
 }
 int gettag() {

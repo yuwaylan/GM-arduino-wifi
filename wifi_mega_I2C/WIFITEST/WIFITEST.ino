@@ -36,13 +36,14 @@ void setup()
 }
 int counter = 0;
 void loop() {
-  String sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=99";
+  String sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=";
   //s99 for test
   
   /*------MEGA I2C---------------*/
    if(mega.available()){
     String val =mega.readString();
     Serial.println(val);
+    sendGET+=val;
   }
   delay(100);
   /*------------------------------*/
