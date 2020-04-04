@@ -19,7 +19,7 @@ void setup()
   pinMode(D7, OUTPUT);
   digitalWrite(D7, HIGH); //紅燈亮
   digitalWrite(D4, HIGH);  //黃燈亮
-  Serial.begin(115200);
+  Serial.begin(9600);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(300);
@@ -43,9 +43,8 @@ void loop() {
    if(mega.available()){
     String val =mega.readString();
     Serial.println(val);
-    Serial.println("REC from mega");   
   }
-  delay(30);
+  delay(100);
   /*------------------------------*/
 
   connection(sendGET);//送資料到網頁

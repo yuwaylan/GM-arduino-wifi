@@ -9,18 +9,17 @@ String tags[49] = {
   "22966251", "3820146251", "2463205251", "11872144251", "230253145251", "19818152251", "1982166250", "2267153251", "62092250", "70207213251",
   "102162193251", "11825474250", "7024033251", "3879213251", "134133142251", "13452202251", "18245213251", "10252202251", "246242207251", "2146347251", "1665549251"
 };
-/*-----------------------*/
 
 #define RST_PIN 49 // 讀卡機的重置腳位
 #define SS_PIN 53  // 晶片選擇腳位
 #define r3 30
 #define r4 31
-SoftwareSerial mwifi(A4, A5); // //建立軟體串列埠腳位 (RX, TX)
-MFRC522 mfrc522(SS_PIN, RST_PIN); // 建立MFRC522物件
 
+MFRC522 mfrc522(SS_PIN, RST_PIN); // 建立MFRC522物件
+SoftwareSerial mwifi(A2, A3);
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   mwifi.begin(4800);  //設定軟體通訊速率
   SPI.begin();
   pinMode(r3, OUTPUT);
@@ -31,45 +30,19 @@ void setup()
 
 int last, current, t = 0;
 void loop()
-{
-
-  if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial())
+{ if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial())
   {
     t = gettag();
     if (t > 0)
     {
       mwifi.print(t);
       Serial.println(t);
-      mwifi.println("<-TAG");
     }
-  } else {
-    mwifi.println("this is mega,HI WIFI");
   }
-
-  if (t == 1) {
-    digitalWrite(r3, HIGH);
-    digitalWrite(r4, LOW);
-  }
-  if (t == 2) {
-    digitalWrite(r3, LOW);
-    digitalWrite(r4, LOW);
-  }
-  if (t == 3) {
-    digitalWrite(r4, HIGH);
-    digitalWrite(r3, LOW);
-  }
-
-
-  //Serial.println(t);
-  delay(300);
-
-
-
+  
+  mwifi.write("HI?");  /* sends hello string */
+  delay(1000);
 }
-
-
-
-
 int gettag() {
   String tag;
   int tagid = -100;
