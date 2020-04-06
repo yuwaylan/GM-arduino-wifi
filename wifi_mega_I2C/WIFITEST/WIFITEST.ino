@@ -28,6 +28,7 @@ void setup()
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(300);
+    Serial.print(".");
   }
   Serial.println("WiFi connected!");  //已連接
   Serial.print("IP: ");
@@ -53,7 +54,7 @@ void loop() {
   /*------------------------------*/
 
   connection(sendGET);//送資料到網頁
-  getcom();
+ 
 }
 
 void connection(String sendGET) {
@@ -71,49 +72,4 @@ void connection(String sendGET) {
   }
   client.print(String(sendGET) + " HTTP/1.1\r\n" + "Host: " + host + "\r\nConnection: close\r\n\r\n");  //請求網頁
   delay(800);
-}
-void getcom() {
-  int retry = 0;
-  WiFiClient client = server.available(); //客戶端物件
-  while (!client) {
-    Serial.println("0 connect");
-    Serial.print("retry: ");
-    Serial.println(retry);
-    if (retry >= 50)
-      return;
-  }
-  if (!client.available() ) {
-    delay(100);
-  }
-  String req = client.readStringUntil('\r');
-  int trig1, trig2;
-  Serial.print("REQ:");
-  client.flush();
-  if (req.indexOf("/mot/-1") != -1) {
-    trig1 = 0;
-    trig2 = 1;
-    Serial.print("motor f");
-  }
-  else if (req.indexOf("/mot/1") != -1) {
-    trig1 = 1;
-    trig2 = 0;
-    Serial.print("motor B");
-  }
-  else if (req.indexOf("/mot/0") != -1) {
-    trig1 = 1;
-    trig2 = 1;
-    Serial.print("motor 0");
-  }
-  else
-  { Serial.print("invalid req");
-    client.stop();
-  }
-  client.flush();
-  String s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>\r\n Motor is now ";
-  s += (trig1) ? (trig2 ? "Backword" : "STOP") : (trig2 ? "Forword" : "STOP");
-  s += "</html>\n";
-  client.print(s);
-  delay(3);
-  client.stop();
-
 }
