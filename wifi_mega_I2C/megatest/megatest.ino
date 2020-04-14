@@ -12,8 +12,8 @@ String tags[49] = {
 
 #define RST_PIN 49 // 讀卡機的重置腳位
 #define SS_PIN 53  // 晶片選擇腳位
-#define r3 30
-#define r4 31
+#define LP 7
+#define RP 6
 
 MFRC522 mfrc522(SS_PIN, RST_PIN); // 建立MFRC522物件
 SoftwareSerial mwifi(A2, A3);
@@ -22,30 +22,34 @@ void setup()
   Serial.begin(9600);
   mwifi.begin(4800);  //設定軟體通訊速率
   SPI.begin();
-  pinMode(r3, OUTPUT);
-  pinMode(r4, OUTPUT);
+  pinMode(LP, OUTPUT);
+  pinMode(RP, OUTPUT);
   mfrc522.PCD_Init(); // 初始化MFRC522讀卡機模組
   Serial.println("RFID reader is ready!");
+
 }
 
 int last, current, t = 0;
 String stag = "";
 void loop()
-{ 
- 
-  if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial())
-  {
+{
+
+  //Read rfid tag
+  /***************************************************************/
+  if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
     t = gettag();
-    if (t > 0)
-    {
-       stag="";
-      stag+=t;
+    if (t > 0) {
+      stag = "";
+      stag += t;
       Serial.println(t);
     }
   }
-
-  mwifi.println(stag);  /* sends hello string */
+  //Read rfid tag end
+  /***************************************************************/
+  stepctrl(t);
+  mwifi.println(stag);  /* send string to wifi */
   delay(1000);
+
 }
 int gettag() {
   String tag;
@@ -65,12 +69,51 @@ int gettag() {
   }
   /*----------get tag id ---------------*/
   if (tagid != last) {
-    //current=tagid;
     last = tagid;
   }
   else {
     tagid = -1;
   }
   return tagid;
+}
 
+void stepctrl(int tag) {
+  //Serial.println("stepctrl called");
+  switch (tag) {
+    case 4:
+      analogWrite(LP, 255);
+      analogWrite(RP, 0);
+      Serial.println("LP:255,RP:0");
+      break;
+    case 5:
+      analogWrite(LP, 200);
+      analogWrite(RP, 0);
+      Serial.println("LP:200,RP:0");
+      break;
+    case 6:
+      analogWrite(LP, 150);
+      analogWrite(RP, 0);
+      Serial.println("LP:150,RP:0");
+      break;
+    case 7:
+      analogWrite(LP, 0);
+      analogWrite(RP, 255);
+      Serial.println("LP:0,RP:255");
+      break;
+    case 8:
+      analogWrite(LP, 0 );
+      analogWrite(RP, 200);
+      Serial.println("LP:0,RP:200");
+      break;
+    case 9:
+      analogWrite(LP, 0 );
+      analogWrite(RP, 150);
+      Serial.println("LP:0,RP:150");
+      break;
+    default:
+      analogWrite(LP, 0);
+      analogWrite(RP, 0);
+     // Serial.println("LP:0,RP:0");
+      break;
+  }
 }
