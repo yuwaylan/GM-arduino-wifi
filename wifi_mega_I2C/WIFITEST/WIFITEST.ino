@@ -1,9 +1,13 @@
-#include <String.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
+#include <ESP8266WiFiMulti.h>
 #include <SoftwareSerial.h>//for I2C
-#define mpin1 D5
-#define mpin2 D6
-#define resmega D3
+#include <String.h>
+
+#define Y_LED D4
+#define R_LED D7
+#define resmega D0
 
 const char* ssid = "GOGO";
 const char* password = "qqqqqqqq";
@@ -16,47 +20,85 @@ SoftwareSerial mega(D1, D2); //建立軟體串列埠腳位 (RX, TX)
 
 void setup()
 {
-  pinMode(D3, OUTPUT);//mega reset
+  pinMode(D0, OUTPUT);//mega reset
   pinMode(D4, OUTPUT);//LED 黃
-  pinMode(D5, OUTPUT);//motor1
-  pinMode(D6, OUTPUT);//motor2
   pinMode(D7, OUTPUT);//LED 紅
 
   digitalWrite(D7, HIGH); //紅燈亮
   digitalWrite(D4, HIGH);  //黃燈亮
   Serial.begin(115200);
+
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(300);
-    Serial.print(".");
+    delay(100);
+    //Serial.print(".");
   }
   Serial.println("WiFi connected!");  //已連接
   Serial.print("IP: ");
   WiFi.config(staticIP, WiFi.gatewayIP(), subnet);
   delay(1000);
   Serial.println(WiFi.localIP());  //顯示IP位址
+  server.begin();
   mega.begin(4800);  //設定軟體通訊速率
 
   digitalWrite(D7, LOW);//紅燈
 }
 int counter = 0;
 void loop() {
-  String sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=";
-  //s99 for test
 
+  String sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r="; //s99 for test
+  WiFiClient client = server.available();
+  if (!client)
+  {
+    sendGET += Rmega();
+    connection(sendGET);
+    return;
+  }
+  while (!client.available())
+  {
+    digitalWrite(R_LED, HIGH);
+    digitalWrite(Y_LED, HIGH);
+    Serial.print(".");
+    delay(1);
+  }
+  digitalWrite(R_LED, LOW);
+  digitalWrite(Y_LED, LOW);
+  sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=";
+  sendGET += Rmega();
+  connection(sendGET);//送資料到網頁
+  String head=client.readStringUntil('\r');
+  //GET /8888 HTTP/1.1
+  head.replace("GET /","");
+  head.replace(" HTTP/1.1","");
+  Serial.println(head);
+  client.println("<!DOCTYPE HTML>");
+  client.println("<html><head><meta http-equiv=\"refresh\" content=\"5\" /></head><body>");
+  client.println(sendGET);
+  client.println("</body></html>");
+  
+
+  client.flush();
+  client.stop();
+  delay(1000);
+
+
+
+
+}//loop end
+
+/*------I2C  Send Get Request-----------------*/
+String Rmega() {
   /*------MEGA I2C---------------*/
   if (mega.available()) {
     String val = mega.readString();
-    Serial.println(val);
-    sendGET += val;
+    delay(100);
+    //Serial.println(val);
+    //sendGET += val;
+    return val;
   }
-  delay(100);
-  /*------------------------------*/
-
-  connection(sendGET);//送資料到網頁
- 
+  else
+    return "";
 }
-
 void connection(String sendGET) {
   WiFiClient client;  //客戶端物件
   if (!client.connect(host, httpPort)) {
@@ -70,6 +112,7 @@ void connection(String sendGET) {
     digitalWrite(D4, HIGH);
     Serial.println("success");
   }
-  client.print(String(sendGET) + " HTTP/1.1\r\n" + "Host: " + host + "\r\nConnection: close\r\n\r\n");  //請求網頁
+  client.print(String(sendGET) + " HTTP/1.1\r\n" + "Host: " + host +
+               "\r\nConnection: close\r\n\r\n");  //請求網頁
   delay(800);
 }

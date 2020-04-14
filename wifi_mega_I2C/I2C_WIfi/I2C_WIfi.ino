@@ -3,7 +3,8 @@
 #include <SoftwareSerial.h>//for I2C
 #define mpin1 D5
 #define mpin2 D6
-#define resmega D3
+
+#define resmega D1
 
 const char* ssid = "GOGO";
 const char* password = "qqqqqqqq";
