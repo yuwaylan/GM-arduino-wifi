@@ -66,17 +66,20 @@ void loop() {
   sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=";
   sendGET += Rmega();
   connection(sendGET);//送資料到網頁
-  String head=client.readStringUntil('\r');
+  String head = client.readStringUntil('\r');
   //GET /8888 HTTP/1.1
-  head.replace("GET /","");
-  head.replace(" HTTP/1.1","");
+  head.replace("GET /", "");
+  head.replace(" HTTP/1.1", "");
   Serial.println(head);
   client.println("<!DOCTYPE HTML>");
   client.println("<html><head><meta http-equiv=\"refresh\" content=\"5\" /></head><body>");
   client.println(sendGET);
   client.println("</body></html>");
-  
-
+  /*
+     ##可以製作按鈕 讓他可以直接用網頁控制
+     ##直接把Rmega的訊息用</>包起來，C#爬起來比較方便
+  */
+  mega.println(head);
   client.flush();
   client.stop();
   delay(1000);
