@@ -17,6 +17,7 @@ String tags[49] = {
 #define readwifi A1
 #define readwifi2 A0
 
+String Rmwifi() ;
 MFRC522 mfrc522(SS_PIN, RST_PIN); // 建立MFRC522物件
 SoftwareSerial mwifi(A2, A3);
 int last, current, t = 0;
@@ -32,31 +33,32 @@ void setup()
   pinMode(readwifi, INPUT);
   pinMode(readwifi2, INPUT);
   mfrc522.PCD_Init(); // 初始化MFRC522讀卡機模組
-  Serial.println("RFID reader is ready!");
+  Serial.println(F("RFID reader is ready!"));
 }
 
-
+int delay_sendmwifi[2]={0,0};
 void loop()
 {
 
   /***************Read rfid tag** ******************************/
   if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
     
+      
     t = gettag();
-    Serial.println("G");
+    Serial.println(F("G"));
     if (t > 0) {
       stag = "";
       stag += t;
+      Serial.print(F("****************TAG: "));
       Serial.println(t);
       mwifi.print(stag);/* send string to wifi */
-      
-      Rmwifi();
+     // Rmwifi();
     }
   }//Read rfid tag end
-  //Serial.println("HI");
-  Rmwifi();
-
-  delay(800);
+  delay_sendmwifi[0]=millis();
+  mwifi.print("HI");
+  delay(1000);
+  //Rmwifi();
 
 }//end loop
 
@@ -93,21 +95,7 @@ String Rmwifi() {
   int b = analogRead(readwifi2);
   Serial.print("D5: ");
   Serial.print(a);
-  Serial.print("  D6: ");
+  Serial.print(F("  D6: "));
   Serial.println(b);
-}
-void gof(){
-  analogWrite(LP,255);
-  analogWrite(RP,0);
-  Serial.println("前進");
-}
-void gob(){
-  analogWrite(RP,255);
-  analogWrite(LP,0);
-  Serial.println("後退");
-}
-void gop(){
-  analogWrite(LP,0);
-  analogWrite(RP,0);
-  Serial.println("停止");
+  Serial.print(F("FREE SPACE  ")); 
 }

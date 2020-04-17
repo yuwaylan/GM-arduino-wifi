@@ -55,9 +55,9 @@ void loop() {
   WiFiClient client = server.available();
   if (!client)
   {
+    Serial.print("no conec  \t");
     sendGET += Rmega();
     connection(sendGET);
-    delay(800);
     return;
   }
   while (!client.available())
@@ -115,6 +115,7 @@ void loop() {
 
 /*------I2C  Send Get Request-----------------*/
 String Rmega() {
+  Serial.print("  RM");
   if (mega.available()) {
     String val = mega.readString();
     Serial.println(val);
@@ -135,7 +136,7 @@ void connection(String sendGET) {
   {
     digitalWrite(D7, LOW);
     digitalWrite(D4, HIGH);
-    Serial.println("success");
+    Serial.println("  success");
   }
   client.print(String(sendGET) + " HTTP/1.1\r\n" + "Host: " + host +
                "\r\nConnection: close\r\n\r\n");  //請求網頁
