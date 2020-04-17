@@ -8,9 +8,8 @@
 #define Y_LED D4
 #define R_LED D7
 #define sendmega D5
-#define sendmega2 D6
-#define resmega D0
-
+#define sendmega2 D0
+ 
 const char* ssid = "GOGO";
 const char* password = "qqqqqqqq";
 String host = "192.168.137.1";  //網頁主機
@@ -70,8 +69,8 @@ void loop() {
   }
   digitalWrite(R_LED, LOW);
   digitalWrite(Y_LED, LOW);
-  // sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=";
-  // sendGET += Rmega();
+  sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=";
+  sendGET += Rmega();
   connection(sendGET);//送資料到網頁
   String head = client.readStringUntil('\r');
   //GET /8888 HTTP/1.1
@@ -91,14 +90,14 @@ void loop() {
   client.println("<!DOCTYPE HTML>");
   client.println("<html><head>");
   client.println("<meta http-equiv=\"refresh\" content=\"5\" />");
-  client.println("<meta http-equiv=\"Content-Type\" content=\"text/html\" charset=utf-8\">");
+  client.println("<meta http-equiv=\"Content-Type\" content=\"text/html\" charset=big-5\">");
   client.println("</head><body>");
   //client.println(sendGET);
   client.print(getinst(head));
-  client.println("<input type=\"button\" value=\"前進\" onclick=\"location.href='192.168.137.250/f'\"></br>");
-  client.println("<input type=\"button\" value=\"後退\" onclick=\"location.href='192.168.137.250/b'\"></br>");
-  client.println("<input type=\"button\" value=\"暫停\" onclick=\"location.href='192.168.137.250/p'\"></br>");
-  client.println("<input type=\"button\" value=\"列出值\" onclick=\"location.href='192.168.137.250/s'\">");
+  client.println("<hr></br><input type=\"button\" value=\"FROUNT\" onclick=\"location.href='  /f'\"> ");
+  client.println("<input type=\"button\" value=\"BACK\" onclick=\"location.href='/b'\"> ");
+  client.println("<input type=\"button\" value=\"PAUSE\" onclick=\"location.href='/p'\"> ");
+  client.println("<input type=\"button\" value=\"LIST VALUE\" onclick=\"location.href='/s'\">");
   client.println("</body></html>");
   /*
      ##可以製作按鈕 讓他可以直接用網頁控制
@@ -116,16 +115,15 @@ void loop() {
 
 /*------I2C  Send Get Request-----------------*/
 String Rmega() {
-  /*------MEGA I2C---------------*/
   if (mega.available()) {
     String val = mega.readString();
-    //mega.println("I Had Receve");
     Serial.println(val);
     return val;
   }
   else
     return "";
 }
+
 void connection(String sendGET) {
   WiFiClient client;  //客戶端物件
   if (!client.connect(host, httpPort)) {
@@ -143,31 +141,32 @@ void connection(String sendGET) {
                "\r\nConnection: close\r\n\r\n");  //請求網頁
   delay(800);
 }
+
+
 String getinst(String ins) {
   int t = ins[0];
-  Serial.println("getinst");
   switch (t) {
     case 'f':
       Serial.println("Front");
       digitalWrite(sendmega, HIGH);
       digitalWrite(sendmega2, LOW);
-      return "前進";
+      return "Front";
       break;
     case 'b':
       Serial.println("Back");
       digitalWrite(sendmega, LOW);
       digitalWrite(sendmega2, HIGH);
-      return "後退";
+      return "Back";
       break;
     case 'p':
       Serial.println("Pause");
       digitalWrite(sendmega, LOW);
       digitalWrite(sendmega2, LOW);
-      return "後退";
+      return "Pause";
       break;
     case 's':
       Serial.println("list status");
-      return "列出目前狀態";
+      return "list status";
       break;
     default:
       return "";

@@ -14,9 +14,14 @@ String tags[49] = {
 #define SS_PIN 53  // 晶片選擇腳位
 #define LP 7
 #define RP 6
+#define readwifi A1
+#define readwifi2 A0
 
 MFRC522 mfrc522(SS_PIN, RST_PIN); // 建立MFRC522物件
 SoftwareSerial mwifi(A2, A3);
+int last, current, t = 0;
+String stag = "";
+
 void setup()
 {
   Serial.begin(9600);
@@ -24,36 +29,39 @@ void setup()
   SPI.begin();
   pinMode(LP, OUTPUT);
   pinMode(RP, OUTPUT);
+  pinMode(readwifi, INPUT);
+  pinMode(readwifi2, INPUT);
   mfrc522.PCD_Init(); // 初始化MFRC522讀卡機模組
   Serial.println("RFID reader is ready!");
-
 }
 
-int last, current, t = 0;
-String stag = "";
+
 void loop()
 {
 
-  //Read rfid tag
-  /***************************************************************/
+  /***************Read rfid tag** ******************************/
   if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
+    
     t = gettag();
+    Serial.println("G");
     if (t > 0) {
       stag = "";
       stag += t;
       Serial.println(t);
-      mwifi.println(stag);/* send string to wifi */
+      mwifi.print(stag);/* send string to wifi */
+      
       Rmwifi();
     }
   }//Read rfid tag end
-  /***************************************************************/
-//Rmwifi();
-  //stepctrl(t);
+  //Serial.println("HI");
+  Rmwifi();
 
   delay(800);
 
 }//end loop
+
 int gettag() {
+  
   String tag;
   int tagid = -100;
   byte *id = mfrc522.uid.uidByte; // 取得卡片的UID
@@ -79,56 +87,27 @@ int gettag() {
   return tagid;
 }//getteg end
 
-void stepctrl(int tag) {
-  //Serial.println("stepctrl called");
-  switch (tag) {
-    case 4:
-      analogWrite(LP, 255);
-      analogWrite(RP, 0);
-      Serial.println("LP:255,RP:0");
-      break;
-    case 5:
-      analogWrite(LP, 200);
-      analogWrite(RP, 0);
-      Serial.println("LP:200,RP:0");
-      break;
-    case 6:
-      analogWrite(LP, 150);
-      analogWrite(RP, 0);
-      Serial.println("LP:150,RP:0");
-      break;
-    case 7:
-      analogWrite(LP, 0);
-      analogWrite(RP, 255);
-      Serial.println("LP:0,RP:255");
-      break;
-    case 8:
-      analogWrite(LP, 0 );
-      analogWrite(RP, 200);
-      Serial.println("LP:0,RP:200");
-      break;
-    case 9:
-      analogWrite(LP, 0 );
-      analogWrite(RP, 150);
-      Serial.println("LP:0,RP:150");
-      break;
-    default:
-      analogWrite(LP, 0);
-      analogWrite(RP, 0);
-      // Serial.println("LP:0,RP:0");
-      break;
-  }
-}
+
 String Rmwifi() {
-  /*------MEGA I2C---------------*/
-  if (mwifi.available()>0) {
-    String val = mwifi.readString();
-    delay(100);
-    Serial.println(val);
-    return val;
-  }
-  else {
-    Serial.println("non from wifi");
-    return "0 ";
-  }
+  int a = analogRead(readwifi);
+  int b = analogRead(readwifi2);
+  Serial.print("D5: ");
+  Serial.print(a);
+  Serial.print("  D6: ");
+  Serial.println(b);
+}
+void gof(){
+  analogWrite(LP,255);
+  analogWrite(RP,0);
+  Serial.println("前進");
+}
+void gob(){
+  analogWrite(RP,255);
+  analogWrite(LP,0);
+  Serial.println("後退");
+}
+void gop(){
+  analogWrite(LP,0);
+  analogWrite(RP,0);
+  Serial.println("停止");
 }
