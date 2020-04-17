@@ -7,6 +7,8 @@
 
 #define Y_LED D4
 #define R_LED D7
+#define sendmega D5
+#define sendmega2 D6
 #define resmega D0
 
 const char* ssid = "GOGO";
@@ -18,20 +20,24 @@ const int httpPort = 80;
 WiFiServer server(httpPort);
 SoftwareSerial mega(D1, D2); //建立軟體串列埠腳位 (RX, TX)
 
+int counter = 0;
+String sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r="; //s99 for test
 void setup()
 {
   pinMode(D0, OUTPUT);//mega reset
   pinMode(D4, OUTPUT);//LED 黃
   pinMode(D7, OUTPUT);//LED 紅
+  pinMode(sendmega, OUTPUT);
+  pinMode(sendmega2, OUTPUT);
 
   digitalWrite(D7, HIGH); //紅燈亮
   digitalWrite(D4, HIGH);  //黃燈亮
   Serial.begin(115200);
+  mega.begin(4800);  //設定軟體通訊速率
 
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
-    //Serial.print(".");
   }
   Serial.println("WiFi connected!");  //已連接
   Serial.print("IP: ");
@@ -39,19 +45,20 @@ void setup()
   delay(1000);
   Serial.println(WiFi.localIP());  //顯示IP位址
   server.begin();
-  mega.begin(4800);  //設定軟體通訊速率
 
   digitalWrite(D7, LOW);//紅燈
+  digitalWrite(sendmega, LOW);
+  digitalWrite(sendmega2, LOW);
 }
-int counter = 0;
 void loop() {
 
-  String sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r="; //s99 for test
+
   WiFiClient client = server.available();
   if (!client)
   {
     sendGET += Rmega();
     connection(sendGET);
+    delay(800);
     return;
   }
   while (!client.available())
@@ -63,23 +70,41 @@ void loop() {
   }
   digitalWrite(R_LED, LOW);
   digitalWrite(Y_LED, LOW);
-  sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=";
-  sendGET += Rmega();
+  // sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=";
+  // sendGET += Rmega();
   connection(sendGET);//送資料到網頁
   String head = client.readStringUntil('\r');
   //GET /8888 HTTP/1.1
   head.replace("GET /", "");
   head.replace(" HTTP/1.1", "");
-  Serial.println(head);
+  /* Serial.print("*-");
+    Serial.print(head);
+    Serial.println("-*");
+
+    Serial.print("-");
+    Serial.print(head[0]);
+    Serial.println("-");
+    int a=head[0];
+    Serial.println(a);*/
+
+
   client.println("<!DOCTYPE HTML>");
-  client.println("<html><head><meta http-equiv=\"refresh\" content=\"5\" /></head><body>");
-  client.println(sendGET);
+  client.println("<html><head>");
+  client.println("<meta http-equiv=\"refresh\" content=\"5\" />");
+  client.println("<meta http-equiv=\"Content-Type\" content=\"text/html\" charset=utf-8\">");
+  client.println("</head><body>");
+  //client.println(sendGET);
+  client.print(getinst(head));
+  client.println("<input type=\"button\" value=\"前進\" onclick=\"location.href='192.168.137.250/f'\"></br>");
+  client.println("<input type=\"button\" value=\"後退\" onclick=\"location.href='192.168.137.250/b'\"></br>");
+  client.println("<input type=\"button\" value=\"暫停\" onclick=\"location.href='192.168.137.250/p'\"></br>");
+  client.println("<input type=\"button\" value=\"列出值\" onclick=\"location.href='192.168.137.250/s'\">");
   client.println("</body></html>");
   /*
      ##可以製作按鈕 讓他可以直接用網頁控制
      ##直接把Rmega的訊息用</>包起來，C#爬起來比較方便
   */
-  mega.println(head);
+
   client.flush();
   client.stop();
   delay(1000);
@@ -94,9 +119,8 @@ String Rmega() {
   /*------MEGA I2C---------------*/
   if (mega.available()) {
     String val = mega.readString();
-    delay(100);
-    //Serial.println(val);
-    //sendGET += val;
+    //mega.println("I Had Receve");
+    Serial.println(val);
     return val;
   }
   else
@@ -118,4 +142,36 @@ void connection(String sendGET) {
   client.print(String(sendGET) + " HTTP/1.1\r\n" + "Host: " + host +
                "\r\nConnection: close\r\n\r\n");  //請求網頁
   delay(800);
+}
+String getinst(String ins) {
+  int t = ins[0];
+  Serial.println("getinst");
+  switch (t) {
+    case 'f':
+      Serial.println("Front");
+      digitalWrite(sendmega, HIGH);
+      digitalWrite(sendmega2, LOW);
+      return "前進";
+      break;
+    case 'b':
+      Serial.println("Back");
+      digitalWrite(sendmega, LOW);
+      digitalWrite(sendmega2, HIGH);
+      return "後退";
+      break;
+    case 'p':
+      Serial.println("Pause");
+      digitalWrite(sendmega, LOW);
+      digitalWrite(sendmega2, LOW);
+      return "後退";
+      break;
+    case 's':
+      Serial.println("list status");
+      return "列出目前狀態";
+      break;
+    default:
+      return "";
+      break;
+  }
+
 }

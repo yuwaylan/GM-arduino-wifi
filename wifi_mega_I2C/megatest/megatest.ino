@@ -42,19 +42,17 @@ void loop()
       stag = "";
       stag += t;
       Serial.println(t);
+      mwifi.println(stag);/* send string to wifi */
+      Rmwifi();
     }
-  }
-  //Read rfid tag end
+  }//Read rfid tag end
   /***************************************************************/
+//Rmwifi();
   //stepctrl(t);
-  mwifi.println(stag);  /* send string to wifi */
-  String fromwifi= Rmwifi();
-  if( fromwifi!=""){
-    Serial.print( fromwifi);
-  }
-  delay(1000);
 
-}
+  delay(800);
+
+}//end loop
 int gettag() {
   String tag;
   int tagid = -100;
@@ -79,7 +77,7 @@ int gettag() {
     tagid = -1;
   }
   return tagid;
-}
+}//getteg end
 
 void stepctrl(int tag) {
   //Serial.println("stepctrl called");
@@ -117,19 +115,20 @@ void stepctrl(int tag) {
     default:
       analogWrite(LP, 0);
       analogWrite(RP, 0);
-     // Serial.println("LP:0,RP:0");
+      // Serial.println("LP:0,RP:0");
       break;
   }
 }
 String Rmwifi() {
   /*------MEGA I2C---------------*/
-  if (mwifi.available()) {
+  if (mwifi.available()>0) {
     String val = mwifi.readString();
     delay(100);
+    Serial.println(val);
     return val;
   }
-  else{
+  else {
     Serial.println("non from wifi");
-    return "";
-    }
+    return "0 ";
+  }
 }
