@@ -18,12 +18,12 @@
         echo $drow['id_counter'];
         echo " , status:";
         echo $drow['sta'];
-        echo " , U1:";
-        echo $drow['u_pos_1'];
-        echo " , U2:";
-        echo $drow['u_pos_2'];
-        echo " , U3:";
-        echo $drow['u_pos_3'];
+        echo " , motor satte:";
+        echo $drow['motor_state'];
+        echo " , listen state:";
+        echo $drow['listen_state'];
+        echo " , shoot state:";
+        echo $drow['shoot_state'];
         echo " , rfid:";
         echo $drow['rid_pos'];
     } else {
