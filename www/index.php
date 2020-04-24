@@ -22,6 +22,7 @@
         echo "id:";
         echo "<id value=" . $drow['id_counter'] . ">" . $drow['id_counter'] . "</id>";
         echo " , status:";
+<<<<<<< HEAD
         echo "<status value=" . $drow['sta'] . ">" . $drow['sta'] . "</status>";
         echo " , U1:";
         echo $drow['u_pos_1']; //u_pos_1 為馬達狀態
@@ -29,6 +30,15 @@
         echo $drow['u_pos_2'];
         echo " , U3:";
         echo $drow['u_pos_3'];
+=======
+        echo $drow['sta'];
+        echo " , motor satte:";
+        echo $drow['motor_state'];
+        echo " , listen state:";
+        echo $drow['listen_state'];
+        echo " , shoot state:";
+        echo $drow['shoot_state'];
+>>>>>>> 0d45c8713a7d8b2a50297caae04bd46df0ca7c77
         echo " , rfid:";
         echo $drow['rid_pos'];
     } else {
