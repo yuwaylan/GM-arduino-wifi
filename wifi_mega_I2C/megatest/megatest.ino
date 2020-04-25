@@ -18,6 +18,7 @@ String tags[49] = {
 #define readwifi2 A0
 
 String Rmwifi() ;
+int gettag();
 MFRC522 mfrc522(SS_PIN, RST_PIN); // 建立MFRC522物件
 SoftwareSerial mwifi(A2, A3);
 int last, current, t = 0;
@@ -36,57 +37,53 @@ void setup()
   Serial.println(F("RFID reader is ready!"));
 }
 
-int delay_sendmwifi[2]={0,0};
+int delay_sendmwifi[2] = {0, 0};
 void loop()
 {
-
   /***************Read rfid tag** ******************************/
-  if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
-    
-      
-    t = gettag();
-    Serial.println(F("G"));
-    if (t > 0) {
-      stag = "";
-      stag += t;
-      Serial.print(F("****************TAG: "));
-      Serial.println(t);
-      mwifi.print(stag);/* send string to wifi */
-     // Rmwifi();
-    }
-  }//Read rfid tag end
-  delay_sendmwifi[0]=millis();
-  mwifi.print("HI");
-  delay(1000);
-  //Rmwifi();
+ /* t = gettag();
+  if (t > 0&&t<100) {
+    stag = "";
+    stag += t;
+    Serial.println(t);
+    mwifi.print(stag);/* send string to wifi 
+  }*/
+  Rmwifi();
+
+ // delay_sendmwifi[0] = millis();
+ // mwifi.print("HI");
+  delay(800);
+  //
 
 }//end loop
 
 int gettag() {
-  
-  String tag;
-  int tagid = -100;
-  byte *id = mfrc522.uid.uidByte; // 取得卡片的UID
-  byte idSize = mfrc522.uid.size; // 取得UID的長度
-  for (byte i = 0; i < idSize; i++)
-  {
-    tag += id[i];
-  }
-  for (int i = 49; i > 0; i--) {
-    if (tags[i] == tag) {
-      mfrc522.PICC_HaltA(); // 讓卡片進入停止模式
-      tagid = 49 - i;
-      break;
+  Serial.print("GET TAG:");
+  if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
+    String tag;
+    int tagid = -100;
+    byte *id = mfrc522.uid.uidByte; // 取得卡片的UID
+    byte idSize = mfrc522.uid.size; // 取得UID的長度
+    for (byte i = 0; i < idSize; i++)
+    {
+      tag += id[i];
     }
-  }
-  /*----------get tag id ---------------*/
-  if (tagid != last) {
-    last = tagid;
-  }
-  else {
-    tagid = -1;
-  }
-  return tagid;
+    for (int i = 49; i > 0; i--) {
+      if (tags[i] == tag) {
+        mfrc522.PICC_HaltA(); // 讓卡片進入停止模式
+        tagid = 49 - i;
+        break;
+      }
+    }
+    /*----------get tag id ---------------*/
+    if (tagid != last) {
+      last = tagid;
+    }
+    else {
+      tagid = -1;
+    }
+    return tagid;
+  }//Read rfid tag end
 }//getteg end
 
 
@@ -97,5 +94,20 @@ String Rmwifi() {
   Serial.print(a);
   Serial.print(F("  D6: "));
   Serial.println(b);
-  Serial.print(F("FREE SPACE  ")); 
+  if(a>500&&b>500){
+    analogWrite(LP,255);
+    analogWrite(RP,0);
+  }
+  else if(a>500&&b<500){
+    analogWrite(LP,150);
+    analogWrite(RP,0);
+  }
+  else if(a<500&&b>500){
+    analogWrite(LP,0);
+    analogWrite(RP,255);
+  }
+  else if(a<500&&b<500){
+    analogWrite(LP,0);
+    analogWrite(RP,0);
+  }
 }

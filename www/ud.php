@@ -17,11 +17,11 @@
         mysqli_select_db($db, 'clientt');
         // echo ' DB連線成功 ';
 
-        $sqlsearch = "SELECT `id_counter`, `sta`, `u_pos_1`, `u_pos_2`, `u_pos_3`, `rid_pos` FROM `clientt` WHERE `id_counter`  =$cid";
+        $sqlsearch = "SELECT `id_counter`, `sta`, `mot_state`, `listen_state`, `shoot_state`, `rid_pos` FROM `clientt` WHERE `id_counter`  =$cid";
         $hadid = $db->query($sqlsearch);
         if ($hadid->num_rows > 0) {
             //修改
-            $sqlfix = "UPDATE `clientt` SET `sta`=$status,`u_pos_1`=$u1,`u_pos_2`=$u2,`u_pos_3`=$u3,`rid_pos`=$rfidtag WHERE`id_counter`= $cid";
+            $sqlfix = "UPDATE `clientt` SET `sta`=$status,`mot_state`=$u1,`listen_state`=$u2,`shoot_state`=$u3,`rid_pos`=$rfidtag WHERE`id_counter`= $cid";
             $fixgood = $db->query($sqlfix);
             if ($fixgood) {
                 echo "fix";
@@ -29,7 +29,7 @@
                 echo "fix fail";
         } else {
             //新增
-            $sqladd = "INSERT INTO `clientt` (`id_counter`, `sta`, `u_pos_1`, `u_pos_2`, `u_pos_3`, `rid_pos`) VALUES (' $cid ', '$status', '$u1', '$u2', '$u3', '$rfidtag')";
+            $sqladd = "INSERT INTO `clientt` (`id_counter`, `sta`, `mot_state`, `listen_state`, `shoot_state`, `rid_pos`) VALUES (' $cid ', '$status', '$u1', '$u2', '$u3', '$rfidtag')";
             $add = $db->query($sqladd);
             if ($add) {
                 /*echo "sent c :";

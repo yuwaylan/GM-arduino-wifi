@@ -89,12 +89,13 @@ void loop() {
 
   client.println("<!DOCTYPE HTML>");
   client.println("<html><head>");
-  client.println("<meta http-equiv=\"refresh\" content=\"5\" />");
+  //client.println("<meta http-equiv=\"refresh\" content=\"5\" />");
   client.println("<meta http-equiv=\"Content-Type\" content=\"text/html\" charset=big-5\">");
   client.println("</head><body>");
   //client.println(sendGET);
   client.print(getinst(head));
-  client.println("<hr></br><input type=\"button\" value=\"FROUNT\" onclick=\"location.href='  /f'\"> ");
+  client.println("<hr></br><input type=\"button\" value=\"FROUNT\" onclick=\"location.href='/f'\"> ");
+  client.println("<hr></br><input type=\"button\" value=\"FB\" onclick=\"location.href='/g'\"> ");
   client.println("<input type=\"button\" value=\"BACK\" onclick=\"location.href='/b'\"> ");
   client.println("<input type=\"button\" value=\"PAUSE\" onclick=\"location.href='/p'\"> ");
   client.println("<input type=\"button\" value=\"LIST VALUE\" onclick=\"location.href='/s'\">");
@@ -150,8 +151,14 @@ String getinst(String ins) {
     case 'f':
       Serial.println("Front");
       digitalWrite(sendmega, HIGH);
-      digitalWrite(sendmega2, LOW);
+      digitalWrite(sendmega2, HIGH);
       return "Front";
+      break;
+      case 'g':
+      Serial.println("Frb");
+      digitalWrite(sendmega, HIGH);
+      digitalWrite(sendmega2, LOW);
+      return "not so Front";
       break;
     case 'b':
       Serial.println("Back");
