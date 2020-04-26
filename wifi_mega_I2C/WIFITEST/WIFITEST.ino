@@ -9,7 +9,14 @@
 #define R_LED D7
 #define sendmega D5
 #define sendmega2 D0
- 
+/*
+  c=>key index to conform whitch is avaliable
+  s=> 狀態 是否有在玩
+  u1=> 馬達狀態
+  u2=> 偷聽狀態
+  u3=> 射擊狀態
+  r=>rfid編號
+*/
 const char* ssid = "GOGO";
 const char* password = "qqqqqqqq";
 String host = "192.168.137.1";  //網頁主機
@@ -20,7 +27,7 @@ WiFiServer server(httpPort);
 SoftwareSerial mega(D1, D2); //建立軟體串列埠腳位 (RX, TX)
 
 int counter = 0;
-String sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r="; //s99 for test
+String sendGET = "GET /ud.php?"; //s99 for test
 void setup()
 {
   pinMode(D0, OUTPUT);//mega reset
@@ -154,7 +161,7 @@ String getinst(String ins) {
       digitalWrite(sendmega2, HIGH);
       return "Front";
       break;
-      case 'g':
+    case 'g':
       Serial.println("Frb");
       digitalWrite(sendmega, HIGH);
       digitalWrite(sendmega2, LOW);
@@ -180,5 +187,4 @@ String getinst(String ins) {
       return "";
       break;
   }
-
 }
