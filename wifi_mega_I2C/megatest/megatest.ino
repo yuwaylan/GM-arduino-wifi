@@ -40,19 +40,19 @@ void setup()
 int delay_sendmwifi[2] = {0, 0};
 void loop()
 {
-  /***************Read rfid tag** ******************************/
- /* t = gettag();
+  t = gettag();
   if (t > 0&&t<100) {
     stag = "";
     stag += t;
     Serial.println(t);
-    mwifi.print(stag);/* send string to wifi 
-  }*/
+    mwifi.print(stag);// send string to wifi 
+     delay(800);
+  }
   Rmwifi();
 
  // delay_sendmwifi[0] = millis();
  // mwifi.print("HI");
-  delay(800);
+ 
   //
 
 }//end loop
@@ -75,7 +75,6 @@ int gettag() {
         break;
       }
     }
-    /*----------get tag id ---------------*/
     if (tagid != last) {
       last = tagid;
     }
