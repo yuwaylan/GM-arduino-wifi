@@ -27,7 +27,8 @@ WiFiServer server(httpPort);
 SoftwareSerial mega(D1, D2); //建立軟體串列埠腳位 (RX, TX)
 
 int counter = 0;
-String sendGET = "GET /ud.php?"; //s99 for test
+String sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r="; //s99 for test
+String tag="";
 void setup()
 {
   pinMode(D0, OUTPUT);//mega reset
@@ -127,6 +128,7 @@ String Rmega() {
   if (mega.available()) {
     String val = mega.readString();
     Serial.println(val);
+    tag=val;
     return val;
   }
   else
@@ -153,6 +155,7 @@ void connection(String sendGET) {
 
 
 String getinst(String ins) {
+  
   int t = ins[0];
   switch (t) {
     case 'f':

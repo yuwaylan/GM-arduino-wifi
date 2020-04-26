@@ -35,19 +35,20 @@ void setup()
   pinMode(readwifi2, INPUT);
   mfrc522.PCD_Init(); // 初始化MFRC522讀卡機模組
   Serial.println(F("RFID reader is ready!"));
+
 }
 
 int delay_sendmwifi[2] = {0, 0};
 void loop()
-{
+{/*
   t = gettag();
   if (t > 0&&t<100) {
     stag = "";
     stag += t;
     Serial.println(t);
     mwifi.print(stag);// send string to wifi 
-     delay(800);
-  }
+     delay(1000);
+  }*/
   Rmwifi();
 
  // delay_sendmwifi[0] = millis();
@@ -58,7 +59,7 @@ void loop()
 }//end loop
 
 int gettag() {
-  Serial.print("GET TAG:");
+  Serial.println("GET TAG:");
   if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
     String tag;
     int tagid = -100;
@@ -109,4 +110,5 @@ String Rmwifi() {
     analogWrite(LP,0);
     analogWrite(RP,0);
   }
+  delay(300);
 }
