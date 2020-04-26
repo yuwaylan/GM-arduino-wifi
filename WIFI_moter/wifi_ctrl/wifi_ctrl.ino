@@ -2,7 +2,6 @@
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
 #include <ESP8266WiFiMulti.h>
-#include <SoftwareSerial.h>//for I2C
 #include <String.h>
 
 #define tell_bird_st D1
@@ -12,7 +11,15 @@
 #define tell_motorL D5
 #define tell_motorR D6
 #define tell_motor_s D7
- 
+/*
+   收到的訊息:
+   1:小鳥開始
+   2.偷聽開始
+   3.馬達全速正轉
+   4.馬達慢速正轉
+   5.馬達反轉
+   6.暫停
+*/
 const char* ssid = "GOGO";
 const char* password = "qqqqqqqq";
 String host = "192.168.137.1";  //網頁主機
@@ -30,11 +37,10 @@ void setup()
   pinMode(tell_motorL, OUTPUT);
   pinMode(tell_motorR, OUTPUT);
   pinMode(tell_motor_s, OUTPUT);
-  pinMode(know_bird_ok,OUTPUT);
-  pinMode(know_listen_ok,OUTPUT
-  
+  pinMode(know_bird_ok, OUTPUT);
+  pinMode(know_listen_ok, OUTPUT);
   Serial.begin(115200);
-  
+
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
@@ -55,10 +61,10 @@ void loop() {
   {
     Serial.print("no conec  \t");
     /*
-     * 1. 監聽等待網頁連線 (等馬達 等裝置)
-     * 2. 如果馬達狀態改變才去呼叫
-     * 3. 如果裝置需啟動才呼叫
-     * 
+       1. 監聽等待網頁連線 (等馬達 等裝置)
+       2. 如果馬達狀態改變才去呼叫
+       3. 如果裝置需啟動才呼叫
+
     */
     return;
   }
@@ -70,26 +76,20 @@ void loop() {
   String head = client.readStringUntil('\r');
   head.replace("GET /", "");
   head.replace(" HTTP/1.1", "");
-  
+  processmessage(head);
 
-  
+
   client.println("<!DOCTYPE HTML>");
   client.println("<html><head>");
-  //client.println("<meta http-equiv=\"refresh\" content=\"5\" />");
   client.println("<meta http-equiv=\"Content-Type\" content=\"text/html\" charset=big-5\">");
   client.println("</head><body>");
-  //client.println(sendGET);
-  client.print(getinst(head));
   client.println("<hr></br><input type=\"button\" value=\"FROUNT\" onclick=\"location.href='/f'\"> ");
   client.println("<hr></br><input type=\"button\" value=\"FB\" onclick=\"location.href='/g'\"> ");
   client.println("<input type=\"button\" value=\"BACK\" onclick=\"location.href='/b'\"> ");
   client.println("<input type=\"button\" value=\"PAUSE\" onclick=\"location.href='/p'\"> ");
   client.println("<input type=\"button\" value=\"LIST VALUE\" onclick=\"location.href='/s'\">");
   client.println("</body></html>");
-  /*
-     ##可以製作按鈕 讓他可以直接用網頁控制
-     ##直接把Rmega的訊息用</>包起來，C#爬起來比較方便
-  */
+
 
   client.flush();
   client.stop();
@@ -100,29 +100,14 @@ void loop() {
 
 }//loop end
 
-/*------I2C  Send Get Request-----------------*/
-String Rmega() {
-  Serial.print("  RM");
-  if (mega.available()) {
-    String val = mega.readString();
-    Serial.println(val);
-    return val;
-  }
-  else
-    return "";
-}
 
 void connection(String sendGET) {
   WiFiClient client;  //客戶端物件
   if (!client.connect(host, httpPort)) {
     Serial.println("connection failed!");  //主機連線失敗
-    digitalWrite(D7, HIGH);//紅燈亮
-    digitalWrite(D4, LOW);//黃燈暗
     return;
   } else
   {
-    digitalWrite(D7, LOW);
-    digitalWrite(D4, HIGH);
     Serial.println("  success");
   }
   client.print(String(sendGET) + " HTTP/1.1\r\n" + "Host: " + host +
@@ -131,40 +116,81 @@ void connection(String sendGET) {
 }
 
 
-String getinst(String ins) {
+String motormove(String ins) {
   int t = ins[0];
   switch (t) {
     case 'f':
-      Serial.println("Front");
-      digitalWrite(sendmega, HIGH);
-      digitalWrite(sendmega2, HIGH);
+      Serial.println("Front Full speed");
+      digitalWrite(tell_motorL, HIGH);
+      digitalWrite(tell_motorR, LOW);
+      digitalWrite(tell_motor_s, HIGH);
       return "Front";
       break;
-      case 'g':
+    case 'g':
       Serial.println("Frb");
-      digitalWrite(sendmega, HIGH);
-      digitalWrite(sendmega2, LOW);
+      digitalWrite(tell_motorL, HIGH);
+      digitalWrite(tell_motorR, LOW);
+      digitalWrite(tell_motor_s, LOW);
       return "not so Front";
       break;
     case 'b':
       Serial.println("Back");
-      digitalWrite(sendmega, LOW);
-      digitalWrite(sendmega2, HIGH);
+      digitalWrite(tell_motorR, HIGH);
+      digitalWrite(tell_motorL, LOW);
       return "Back";
       break;
     case 'p':
       Serial.println("Pause");
-      digitalWrite(sendmega, LOW);
-      digitalWrite(sendmega2, LOW);
+      digitalWrite(tell_motorL, LOW);
+      digitalWrite(tell_motorR, LOW);
       return "Pause";
       break;
-    case 's':
-      Serial.println("list status");
-      return "list status";
-      break;
+
     default:
       return "";
       break;
   }
+}
 
+
+/*
+   收到的訊息:
+   1:小鳥開始
+   2.偷聽開始
+   3.馬達全速正轉
+   4.馬達慢速正轉
+   5.馬達反轉
+   6.暫停
+*/
+String processmessage(String head) {
+  switch (head[0]) {
+    case 1:
+      Od(tell_bird_st, HIGH);
+      say("bird start");
+      break;
+    case 2:
+      Od(tell_listen_st, HIGH);
+      say("listen start");
+      break;
+    case 3:
+    motormove("f");
+      break;
+    case 4:
+    motormove("g");
+      break;
+    case 5:
+    motormove("b");
+      break;
+    case 6:
+    motormove("p");
+      break;
+    default:
+      break;
+  }
+}
+void Od(int pin, int ele) {
+  digitalWrite(pin, ele);
+}
+void say(String s) {
+  Serial.println(s);
 }
