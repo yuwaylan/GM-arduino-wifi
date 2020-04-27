@@ -68,8 +68,14 @@ void loop() {
     connection(sendGET);
     return;
   }
+  int startt=0,endt=0;
+  startt=millis();
   while (!client.available())
   {
+    endt=millis();
+    if(endt-startt>=2000){
+      return;
+    }
     digitalWrite(R_LED, HIGH);
     digitalWrite(Y_LED, HIGH);
     Serial.print(".");

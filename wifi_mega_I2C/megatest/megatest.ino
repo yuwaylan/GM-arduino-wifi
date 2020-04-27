@@ -38,22 +38,21 @@ void setup()
 
 }
 
-int starttime=0,endtime=0;
 void loop()
-{/*
-  t = gettag();
-  if (t > 0&&t<100) {
-    stag = "";
-    stag += t;
-    Serial.println(t);
-    mwifi.print(stag);// send string to wifi 
-     delay(1000);
-  }*/
+{ /*
+    t = gettag();
+    if (t > 0&&t<100) {
+     stag = "";
+     stag += t;
+     Serial.println(t);
+     mwifi.print(stag);// send string to wifi
+      delay(1000);
+    }*/
   Rmwifi();
 
- // delay_sendmwifi[0] = millis();
- // mwifi.print("HI");
- 
+  // delay_sendmwifi[0] = millis();
+  // mwifi.print("HI");
+
   //
 
 }//end loop
@@ -93,28 +92,27 @@ String Rmwifi() {
   Serial.print(a);
   Serial.print(F("  D6: "));
   Serial.println(b);
-  if(a>500&&b>500){
+  if (a > 500 && b > 500) {
     
-    endtime=millis();
-    analogWrite(LP,255);
-    analogWrite(RP,0);
-  }
-  else if(a>500&&b<500){
-    analogWrite(LP,150);
-    analogWrite(RP,0);
-  }
-  else if(a<500&&b>500){
-    analogWrite(LP,0);
-    analogWrite(RP,255);
-  }
-  else if(a<500&&b<500){
-    analogWrite(LP,0);
-    analogWrite(RP,0);
-  }
-  else{
-     analogWrite(LP,0);
-    analogWrite(RP,0);
+    analogWrite(LP, 255);
+    analogWrite(RP, 0);
     
+  }
+  else if (a > 500 && b < 500) {
+    analogWrite(LP, 150);
+    analogWrite(RP, 0);
+  }
+  else if (a < 500 && b > 500) {
+    analogWrite(LP, 0);
+    analogWrite(RP, 255);
+  }
+  else if (a < 500 && b < 500) {
+    analogWrite(LP, 0);
+    analogWrite(RP, 0);
+  }
+  else {
+    analogWrite(LP, 0);
+    analogWrite(RP, 0);
   }
   delay(300);
 }
