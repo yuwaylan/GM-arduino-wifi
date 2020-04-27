@@ -82,6 +82,7 @@ void loop() {
   connection(sendGET);//送資料到網頁
   String head = client.readStringUntil('\r');
   //GET /8888 HTTP/1.1
+  Serial.println(head);
   head.replace("GET /", "");
   head.replace(" HTTP/1.1", "");
   /* Serial.print("*-");
@@ -94,7 +95,7 @@ void loop() {
     int a=head[0];
     Serial.println(a);*/
 
-
+Serial.println(head);  
   client.println("<!DOCTYPE HTML>");
   client.println("<html><head>");
   //client.println("<meta http-equiv=\"refresh\" content=\"5\" />");

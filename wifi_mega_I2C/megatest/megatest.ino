@@ -38,7 +38,7 @@ void setup()
 
 }
 
-int delay_sendmwifi[2] = {0, 0};
+int starttime=0,endtime=0;
 void loop()
 {/*
   t = gettag();
@@ -86,7 +86,6 @@ int gettag() {
   }//Read rfid tag end
 }//getteg end
 
-
 String Rmwifi() {
   int a = analogRead(readwifi);
   int b = analogRead(readwifi2);
@@ -95,6 +94,8 @@ String Rmwifi() {
   Serial.print(F("  D6: "));
   Serial.println(b);
   if(a>500&&b>500){
+    
+    endtime=millis();
     analogWrite(LP,255);
     analogWrite(RP,0);
   }
@@ -109,6 +110,11 @@ String Rmwifi() {
   else if(a<500&&b<500){
     analogWrite(LP,0);
     analogWrite(RP,0);
+  }
+  else{
+     analogWrite(LP,0);
+    analogWrite(RP,0);
+    
   }
   delay(300);
 }
