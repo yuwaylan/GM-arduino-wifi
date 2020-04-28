@@ -42,16 +42,16 @@ void setup()
   Serial.begin(115200);
   mega.begin(4800);  //設定軟體通訊速率
 
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(100);
-  }
-  Serial.println("WiFi connected!");  //已連接
-  Serial.print("IP: ");
-  WiFi.config(staticIP, WiFi.gatewayIP(), subnet);
-  delay(1000);
-  Serial.println(WiFi.localIP());  //顯示IP位址
-  server.begin();
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(100);
+    }
+    Serial.println("WiFi connected!");  //已連接
+    Serial.print("IP: ");
+    WiFi.config(staticIP, WiFi.gatewayIP(), subnet);
+    delay(1000);
+    Serial.println(WiFi.localIP());  //顯示IP位址
+    server.begin();
 
   digitalWrite(D7, LOW);//紅燈
   digitalWrite(sendmega, LOW);
@@ -90,6 +90,7 @@ void loop() {
   //GET /8888 HTTP/1.1
   Serial.println(head);
   head.replace("GET /", "");
+ // head.replace("POST /", "");
   head.replace(" HTTP/1.1", "");
   /* Serial.print("*-");
     Serial.print(head);
@@ -109,11 +110,11 @@ Serial.println(head);
   client.println("</head><body>");
   //client.println(sendGET);
   client.print(getinst(head));
-  client.println("<hr></br><input type=\"button\" value=\"FROUNT\" onclick=\"location.href='/f'\"> ");
-  client.println("<hr></br><input type=\"button\" value=\"FB\" onclick=\"location.href='/g'\"> ");
-  client.println("<input type=\"button\" value=\"BACK\" onclick=\"location.href='/b'\"> ");
-  client.println("<input type=\"button\" value=\"PAUSE\" onclick=\"location.href='/p'\"> ");
-  client.println("<input type=\"button\" value=\"LIST VALUE\" onclick=\"location.href='/s'\">");
+  client.println("<hr></br><input style=\"width:300px;height:200px;\" type=\"button\" value=\"FROUNT\" onclick=\"location.href='/f'\"> ");
+  client.println("<hr></br><input style=\"width:300px;height:200px;\" type=\"button\" value=\"FB\" onclick=\"location.href='/g'\"> ");
+  client.println("<input style=\"width:300px;height:200px;\" type=\"button\" value=\"BACK\" onclick=\"location.href='/b'\"> ");
+  client.println("<input style=\"width:300px;height:200px;\" type=\"button\" value=\"PAUSE\" onclick=\"location.href='/p'\"> ");
+  client.println("<input style=\"width:3.00px;height:200px;\" type=\"button\" value=\"LIST VALUE\" onclick=\"location.href='/s'\">");
   client.println("</body></html>");
   /*
      ##可以製作按鈕 讓他可以直接用網頁控制
