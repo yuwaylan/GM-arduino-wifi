@@ -50,8 +50,8 @@
     <h1><a href="./bk.php?mode=all">Booking queue</a></h1>
 
     <?php
-    $myfile = fopen("C:\Users\user\Documents\GitHub\GM-arduino-wifi\status.txt", "w") or die("Unable to open file!");
-    $txt = $drow['id_counter'] . "," . $drow['sta'] . "," . $drow['rid_pos'] . "," . $drow['u_pos_1'];
+    $myfile = fopen("D:\t.txt", "w") or die("Unable to open file!");
+    $txt =$drow['rid_pos'] . "," . $drow['sta'] . "," . $drow['rid_pos'] . "," . $drow['u_pos_1'];
     fwrite($myfile, $txt);
     fclose($myfile);
     ?>

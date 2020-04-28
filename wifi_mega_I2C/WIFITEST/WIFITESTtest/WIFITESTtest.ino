@@ -17,8 +17,8 @@
   u3=> 射擊狀態
   r=>rfid編號
 */
-const char* ssid = "GOGO";
-const char* password = "qqqqqqqq";
+const char* ssid = "!00000000";
+const char* password = "11111111";
 String host = "192.168.137.1";  //網頁主機
 IPAddress staticIP(192, 168, 137, 250);
 IPAddress subnet(255, 255, 255, 0);
@@ -57,6 +57,7 @@ void setup()
   digitalWrite(sendmega, LOW);
   digitalWrite(sendmega2, LOW);
 }
+int movementcounter=0;
 void loop() {
 
 
@@ -90,6 +91,7 @@ void loop() {
   //GET /8888 HTTP/1.1
   Serial.println(head);
   head.replace("GET /", "");
+  head.replace("POST /", "");
   head.replace(" HTTP/1.1", "");
   /* Serial.print("*-");
     Serial.print(head);
@@ -102,6 +104,7 @@ void loop() {
     Serial.println(a);*/
 
 Serial.println(head);  
+
   client.println("<!DOCTYPE HTML>");
   client.println("<html><head>");
   //client.println("<meta http-equiv=\"refresh\" content=\"5\" />");
@@ -122,7 +125,7 @@ Serial.println(head);
 
   client.flush();
   client.stop();
-  delay(1000);
+  delay(800);
 
 
 
@@ -191,7 +194,6 @@ String getinst(String ins) {
       break;
     case 's':
       Serial.println("list status");
-      connection("GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=1") ;
       return "list status";
       break;
     default:
