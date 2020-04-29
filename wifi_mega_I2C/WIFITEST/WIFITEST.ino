@@ -1,4 +1,4 @@
-#include <ESP8266WiFi.h>
+ #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
 #include <ESP8266WiFiMulti.h>
@@ -90,7 +90,7 @@ void loop() {
   //GET /8888 HTTP/1.1
   Serial.println(head);
   head.replace("GET /", "");
- // head.replace("POST /", "");
+  head.replace("POST /", "");
   head.replace(" HTTP/1.1", "");
   /* Serial.print("*-");
     Serial.print(head);
