@@ -51,7 +51,7 @@
 
     <?php
     $myfile = fopen("D:\t.txt", "w") or die("Unable to open file!");
-    $txt =$drow['rid_pos'] . "," . $drow['sta'] . "," . $drow['rid_pos'] . "," . $drow['u_pos_1'];
+    $txt =$drow['sta'];. "," . 1 . "," . $drow['shoot_state'] . "," .$drow['listen_state'];
     fwrite($myfile, $txt);
     fclose($myfile);
     ?>
