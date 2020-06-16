@@ -5,11 +5,9 @@
 #include <SoftwareSerial.h>//for I2C
 #include <String.h>
 
-#define Y_LED D4
-#define R_LED D7
 #define sendmega D5
-#define sendmega2 D0
- 
+#define sendmega2 D6
+
 const char* ssid = "GOGO";
 const char* password = "qqqqqqqq";
 String host = "192.168.137.1";  //網頁主機
@@ -17,15 +15,12 @@ IPAddress staticIP(192, 168, 137, 25);
 IPAddress subnet(255, 255, 255, 0);
 const int httpPort = 80;
 WiFiServer server(httpPort);
-SoftwareSerial mega(D2, D3); //建立軟體串列埠腳位 (RX, TX)
+SoftwareSerial mega(D5, D4); //建立軟體串列埠腳位 (RX, TX)
 
 int counter = 0;
-String sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r="; //s99 for test
+String sendGET = "GET /ud.php?r=9&c=9&u1=9"; //s99 for test
 void setup()
 {
-  
-
-  
   Serial.begin(115200);
   mega.begin(4800);  //設定軟體通訊速率
 
@@ -40,41 +35,38 @@ void setup()
   Serial.println(WiFi.localIP());  //顯示IP位址
   server.begin();
 
-  
+
 }
 void loop() {
-
-
+mega.print("11111111111111111111111111111111111");
+delay(550);
   WiFiClient client = server.available();
   if (!client)
   {
     Serial.print("no conec  \t");
+    sendGET = "GET /ud.php?r=9&c=9&u1=9";
     sendGET += Rmega();
-    connection(sendGET);
+      Serial.println(sendGET);
+    connection(sendGET);//送資料到網頁
+
     return;
   }
+  int in = 0, endis = 0;
+  in = millis();
   while (!client.available())
-  {
+  { endis = millis();
+    if (endis - in >= 3000)
+      return;
     Serial.print(".");
     delay(1);
   }
-  sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=";
+  sendGET = "GET /ud.php?r=9&c=9&u1=9";
   sendGET += Rmega();
   connection(sendGET);//送資料到網頁
   String head = client.readStringUntil('\r');
   //GET /8888 HTTP/1.1
   head.replace("GET /", "");
   head.replace(" HTTP/1.1", "");
-  /* Serial.print("*-");
-    Serial.print(head);
-    Serial.println("-*");
-
-    Serial.print("-");
-    Serial.print(head[0]);
-    Serial.println("-");
-    int a=head[0];
-    Serial.println(a);*/
-
 
   client.println("<!DOCTYPE HTML>");
   client.println("<html><head>");
@@ -104,10 +96,12 @@ void loop() {
 }//loop end
 
 /*------I2C  Send Get Request-----------------*/
-String Rmega() {
-  Serial.print("  RM");
+String Rmega() {//直接讓mega 傳送要的指令過來
+  
   if (mega.available()) {
+    Serial.print("ReadMega!");
     String val = mega.readString();
+    delay(1000);
     Serial.println(val);
     return val;
   }
@@ -119,13 +113,9 @@ void connection(String sendGET) {
   WiFiClient client;  //客戶端物件
   if (!client.connect(host, httpPort)) {
     Serial.println("connection failed!");  //主機連線失敗
-    digitalWrite(D7, HIGH);//紅燈亮
-    digitalWrite(D4, LOW);//黃燈暗
     return;
   } else
   {
-    digitalWrite(D7, LOW);
-    digitalWrite(D4, HIGH);
     Serial.println("  success");
   }
   client.print(String(sendGET) + " HTTP/1.1\r\n" + "Host: " + host +
@@ -143,7 +133,7 @@ String getinst(String ins) {
       digitalWrite(sendmega2, HIGH);
       return "Front";
       break;
-      case 'g':
+    case 'g':
       Serial.println("Frb");
       digitalWrite(sendmega, HIGH);
       digitalWrite(sendmega2, LOW);
@@ -164,6 +154,20 @@ String getinst(String ins) {
     case 's':
       Serial.println("list status");
       return "list status";
+      break;
+       case 'x'://射小鳥
+      mega.print("bird");
+      Serial.println("send  bird");
+      delay(800);
+      break;
+       case 'y'://偷聽
+      mega.print("listen");
+       Serial.println("send  listen");
+     delay(800);
+      case 'r'://偷聽
+      mega.print("reset");
+       Serial.println("send  reset");
+     delay(800);
       break;
     default:
       return "";

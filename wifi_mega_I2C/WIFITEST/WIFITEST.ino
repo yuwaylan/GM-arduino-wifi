@@ -83,7 +83,7 @@ void loop() {
   }
   digitalWrite(R_LED, LOW);
   digitalWrite(Y_LED, LOW);
-  sendGET = "GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=";
+  sendGET = "GET /ud.php?u1=99&u2=99&u3=99&c=99&r=";
   sendGET += Rmega();
   connection(sendGET);//送資料到網頁
   String head = client.readStringUntil('\r');
@@ -192,7 +192,7 @@ String getinst(String ins) {
       break;
     case 's':
       Serial.println("list status");
-      connection("GET /ud.php?s=99&u1=99&u2=99&u3=99&c=99&r=1") ;
+      connection("GET /ud.php?s=1&u1=99&u2=99&u3=99&c=99&r=1") ;
       return "list status";
       break;
     default:

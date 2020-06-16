@@ -1,6 +1,6 @@
 
 #include <SoftwareSerial.h>//for I2C
-SoftwareSerial mwifi(A2, A3);
+SoftwareSerial mwifi(A5, A4);
 #define readwifi A1
 #define readwifi2 A0
 void setup()
@@ -14,12 +14,7 @@ void setup()
 int last, current, t = 0;
 void loop()
 { 
-  int a=analogRead(readwifi);
-   int b=analogRead(readwifi2);
-   Serial.print("D5: ");
-  Serial.print(a);
-  Serial.print("  D6: ");
-  Serial.println(b);
+  
   mwifi.write("HI");  /* sends hello string */
   delay(1000);
 }
